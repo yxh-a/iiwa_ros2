@@ -6,8 +6,8 @@
     <xacro:arg name="use_sim" default="false" />
     <xacro:arg name="use_fake_hardware" default="true" />
     <xacro:arg name="prefix" default="" />
-    <xacro:arg name="robot_ip" default="192.170.10.2" />
-    <xacro:arg name="robot_port" default="30200" />
+    <xacro:arg name="robot_ip" default="172.31.1.10" />
+    <xacro:arg name="robot_port" default="30214" />
     <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
     <xacro:arg name="command_interface" default="position" />
     <xacro:arg name="base_frame_file" default="base_frame.yaml" />

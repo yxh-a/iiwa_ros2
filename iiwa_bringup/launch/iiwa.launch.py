@@ -76,14 +76,14 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'use_sim',
-            default_value='false',
+            default_value='true',
             description='Start robot in Gazebo simulation.',
         )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
             'use_fake_hardware',
-            default_value='true',
+            default_value='false',
             description='Start robot with fake hardware mirroring command to its states.',
         )
     )
@@ -119,14 +119,14 @@ def generate_launch_description():
     declared_arguments.append(
         DeclareLaunchArgument(
             'robot_ip',
-            default_value='192.170.10.2',
+            default_value='172.31.1.10',
             description='Robot IP of FRI interface',
         )
     )
     declared_arguments.append(
         DeclareLaunchArgument(
             'robot_port',
-            default_value='30200',
+            default_value='30214',
             description='Robot port of FRI interface.',
         )
     )
@@ -298,24 +298,47 @@ def generate_launch_description():
             'gazebo/worlds', 'empty.world']
     )
 
+    # gazebo = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         [PathJoinSubstitution(
+    #             [FindPackageShare('gazebo_ros'),
+    #                 'launch', 'gazebo.launch.py']
+    #         )]
+    #     ),
+    #     launch_arguments={'verbose': 'false', 'world': iiwa_simulation_world}.items(),
+    #     condition=IfCondition(use_sim),
+    # )
+    world_file = iiwa_simulation_world
+
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [PathJoinSubstitution(
-                [FindPackageShare('gazebo_ros'),
-                    'launch', 'gazebo.launch.py']
-            )]
+            PathJoinSubstitution(
+                [FindPackageShare('ros_gz_sim'), 'launch', 'gz_sim.launch.py']
+            )
         ),
-        launch_arguments={'verbose': 'false', 'world': iiwa_simulation_world}.items(),
+        launch_arguments={'gz_args': world_file}.items(),
         condition=IfCondition(use_sim),
     )
 
+    # spawn_entity = Node(
+    #     package='gazebo_ros',
+    #     executable='spawn_entity.py',
+    #     arguments=['-topic', [namespace, 'robot_description'], '-entity', [namespace, 'iiwa14']],
+    #     output='screen',
+    #     condition=IfCondition(use_sim),
+    # )
+
     spawn_entity = Node(
-        package='gazebo_ros',
-        executable='spawn_entity.py',
-        arguments=['-topic', [namespace, 'robot_description'], '-entity', [namespace, 'iiwa14']],
+        package='ros_gz_sim',
+        executable='create',
+        arguments=[
+        '-name', 'iiwa14',
+        '-topic', '/robot_description'
+        ],
         output='screen',
         condition=IfCondition(use_sim),
     )
+
 
     joint_state_broadcaster_spawner = Node(
         package='controller_manager',
